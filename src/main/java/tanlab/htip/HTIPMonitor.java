@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 
 import org.pcap4j.core.BpfProgram.BpfCompileMode;
 import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode;
+import org.pcap4j.core.Pcaps;
 import org.pcap4j.packet.Packet;
 
 import tanlab.App;
@@ -25,12 +26,12 @@ public class HTIPMonitor {
 	
 	public static void publishHTIPFrame(List<PcapNetworkInterface> interfaceList) throws PcapNativeException {
 		for(PcapNetworkInterface i  : interfaceList) {
+			if(i == Pcaps.getDevByName("eth0")) { 
 			PcapHandle handle = i.openLive(ConstantValues.SNAPSHOT_LENGTH, PromiscuousMode.PROMISCUOUS, 
 					  ConstantValues.READ_TIMEOUT);
 			try {
 				handle.setFilter("ether proto 0x88cc", BpfCompileMode.OPTIMIZE);
 			} catch (Exception e){
-				
 			}
 			
 			ExecutorService service = Executors.newFixedThreadPool(interfaceList.size());
@@ -41,6 +42,7 @@ public class HTIPMonitor {
 		    		App.msgPublisher.publicMessage(obj.toJson());
 		    	}
 		    }));
+			}
 		}
 	}
 	public  HTIPObject testFrame(Packet pkg) {
