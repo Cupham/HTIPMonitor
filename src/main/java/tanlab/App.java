@@ -20,17 +20,9 @@ public class App {
 		} else {
 			String brokerURL = args[0].trim();
 			String topic = args[1].trim();
-			msgPublisher = new KProducer(brokerURL,topic);
-			
-			if(args.length > 2) {
-				HTIPMonitor.publishHTIPFrame(Pcaps.getDevByName(args[2]));
-			} else {
-				List<PcapNetworkInterface> allDevs = Pcaps.findAllDevs();	
-				if(allDevs.size() > 0) {
-					// 3. Monitor and publish HTIP Frame
-					HTIPMonitor.publishHTIPFrame(allDevs);
-				} 	
-			}
+			msgPublisher = new KProducer(brokerURL, topic);
+			List<PcapNetworkInterface> allDevs = Pcaps.findAllDevs();	
+			HTIPMonitor.publishHTIPFrame(allDevs);
 		}
 
 	}

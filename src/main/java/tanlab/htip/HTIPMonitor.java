@@ -43,30 +43,6 @@ public class HTIPMonitor {
 		}
 	}
 	
-	public static void publishHTIPFrame(PcapNetworkInterface nif) throws PcapNativeException, NotOpenException {
-		
-		 final PcapHandle handle = nif.openLive(ConstantValues.SNAPSHOT_LENGTH, PromiscuousMode.PROMISCUOUS, 
-				 ConstantValues.READ_TIMEOUT);
-		    handle.setFilter(ConstantValues.LLDP_FRAME_FILTER, BpfCompileMode.OPTIMIZE);
-		    HTIPManager manager = new HTIPManager(nif.getName(),nif.getLinkLayerAddresses().get(0).toString());
-	    	App.msgPublisher.publicMessage(manager.toJSON());
-		    PacketListener listener =
-		        new PacketListener() {
-		          @Override
-		          public void gotPacket(Packet packet) {
-		        	  	Timestamp time = handle.getTimestamp();
-				    	HTIPObject obj = HTIPFrameUtil.htipFromPacket(time,packet);
-				    	if(obj!= null) {
-				    		App.msgPublisher.publicMessage(obj.toJson());
-				    	}
-		          }
-		        };
-		   try {
-		  	      handle.loop(-1, listener);
-		  	    } catch (InterruptedException e) {
-		  	      e.printStackTrace();
-		  	    }
-		}
 	public  HTIPObject testFrame(Packet pkg) {
 		Timestamp t = new Timestamp(System.currentTimeMillis());
 		return HTIPFrameUtil.htipFromPacket(t,pkg);
