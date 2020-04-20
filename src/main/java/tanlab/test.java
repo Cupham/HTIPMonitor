@@ -16,6 +16,7 @@ import tanlab.constants.ConstantValues;
 import tanlab.htip.HTIPFrameUtil;
 import tanlab.htip.HTIPManager;
 import tanlab.htip.HTIPObject;
+import tanlab.kafka.KProducer;
 
 import org.pcap4j.core.Pcaps;
 import org.pcap4j.packet.Packet;
@@ -24,14 +25,14 @@ import com.sun.jna.Platform;
 
 public class test {
 	public static void main(String[] args) throws PcapNativeException, NotOpenException {
-	    //PcapNetworkInterface nif = Pcaps.getDevByName(args[0]);
-		PcapNetworkInterface nif = Pcaps.getDevByName("eth0");
+	    PcapNetworkInterface nif = Pcaps.getDevByName(args[2]);
+		//PcapNetworkInterface nif = Pcaps.getDevByName("eth0");
 	    System.out.println(nif.getName() + "(" + nif.getDescription() + ")");
-
+	    KProducer msgPublisher = new KProducer(args[0], args[1]);
 	    final PcapHandle handle = nif.openLive(65536, PromiscuousMode.PROMISCUOUS, 10);
 	    handle.setFilter(ConstantValues.LLDP_FRAME_FILTER, BpfCompileMode.OPTIMIZE);
 	    HTIPManager manager = new HTIPManager(nif.getName(),nif.getLinkLayerAddresses().get(0).toString());
-    	App.msgPublisher.publicMessage(manager.toJSON());
+    	msgPublisher.publicMessage(manager.toJSON());
 
 
 	    PacketListener listener =
@@ -41,7 +42,7 @@ public class test {
 	        	  Timestamp time = handle.getTimestamp();
 			    	HTIPObject obj = HTIPFrameUtil.htipFromPacket(time,packet);
 			    	if(obj!= null) {
-			    		App.msgPublisher.publicMessage(obj.toJson());
+			    		msgPublisher.publicMessage(obj.toJson());
 			    	}
 	          }
 	        };

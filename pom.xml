@@ -69,7 +69,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>tanlab.App</mainClass>
+                            <mainClass>tanlab.test</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
