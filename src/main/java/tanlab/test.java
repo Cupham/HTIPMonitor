@@ -23,7 +23,7 @@ public class test {
 	    System.out.println(nif.getName() + "(" + nif.getDescription() + ")");
 
 	    final PcapHandle handle = nif.openLive(65536, PromiscuousMode.PROMISCUOUS, 10);
-	    //handle.setFilter(ConstantValues.LLDP_FRAME_FILTER, BpfCompileMode.OPTIMIZE);
+	    handle.setFilter(ConstantValues.LLDP_FRAME_FILTER, BpfCompileMode.OPTIMIZE);
 	   
 
 	    PacketListener listener =

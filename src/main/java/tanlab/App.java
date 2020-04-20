@@ -2,6 +2,7 @@ package tanlab;
 
 import java.util.List;
 
+import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapNetworkInterface;
 import org.pcap4j.core.Pcaps;
@@ -11,7 +12,7 @@ import tanlab.kafka.KProducer;
 
 public class App {
 	public static KProducer msgPublisher;
-	public static void main(String[] args) throws PcapNativeException {
+	public static void main(String[] args) throws PcapNativeException, NotOpenException {
 		System.out.println("Program Started");
 		
 		if(args.length == 0) {
@@ -19,15 +20,16 @@ public class App {
 		} else {
 			String brokerURL = args[0].trim();
 			String topic = args[1].trim();
-			// 1. Get all available network interfaces
-			List<PcapNetworkInterface> allDevs = Pcaps.findAllDevs();	
-			if(allDevs.size() > 0) {
-				// 2. Initialize Message Publisher
-				msgPublisher = new KProducer(brokerURL,topic);
-				// 3. Monitor and publish HTIP Frame
-				HTIPMonitor.publishHTIPFrame(allDevs);
+			msgPublisher = new KProducer(brokerURL,topic);
+			
+			if(args.length > 2) {
+				HTIPMonitor.publishHTIPFrame(Pcaps.getDevByName(args[2]));
 			} else {
-				System.out.println("No Network Interface is available");
+				List<PcapNetworkInterface> allDevs = Pcaps.findAllDevs();	
+				if(allDevs.size() > 0) {
+					// 3. Monitor and publish HTIP Frame
+					HTIPMonitor.publishHTIPFrame(allDevs);
+				} 	
 			}
 		}
 
